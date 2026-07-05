@@ -34,5 +34,32 @@ def test_get_stock_data():
     assert stock_data.index.max() <= pd.to_datetime(end_date), "DataFrame contains dates after end_date"
     print("All tests passed for get_stock_data function.")
 
+def test_get_returns_series():
+    """
+    Tests the get_returns_series function from the returns module to ensure it calculates daily returns 
+    correctly from stock data.
+    """
+    # Test calculating returns for a known stock data DataFrame
+    print("Testing get_returns_series function...")
+    data = {
+        'Close': [150, 152, 151, 153, 155]
+    }
+    stock_data = pd.DataFrame(data)
+    
+    returns_series = returns.get_returns_series(stock_data)
+    
+    # Check if the returned object is a Series
+    assert isinstance(returns_series, pd.Series), "Returned object is not a Series"
+    
+    # Check if the length of the returns series is one less than the stock data
+    assert len(returns_series) == len(stock_data) - 1, "Returns series length is incorrect"
+    
+    # Check if the first return value is calculated correctly
+    expected_first_return = (152 - 150) / 150
+    assert abs(returns_series.iloc[0] - expected_first_return) < 1e-6, "First return value is incorrect"
+    
+    print("All tests passed for get_returns_series function.")
+
 if __name__ == "__main__":
     test_get_stock_data()
+    test_get_returns_series()
