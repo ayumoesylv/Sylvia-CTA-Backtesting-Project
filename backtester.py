@@ -74,13 +74,44 @@ class Backtester:
 
         return self.table
 
+    def summary_metrics(self):
+        """
+        Returns a dictionary containing summary metrics of the backtesting results, such as volatility, 
+        Sharpe, drawdown, turnover, and trade frequency.
+        """        
+        # Calculate total returns
+        total_return = (self.table["total_portfolio_value"].iloc[-1] / self.initial_cash) - 1
+        # Create daily returns pandas series 
+        daily_returns = self.table["total_portfolio_value"].pct_change().dropna()
+        # volatility, Sharpe, drawdown, turnover, and trade frequency
+        annual_volatility = daily_returns.std() * (252 ** 0.5)
+        annual_sharpe = daily_returns.mean() / daily_returns.std() * (252 ** 0.5)
+        running_max = self.table["total_portfolio_value"].cummax()
+        drawdown = self.table["total_portfolio_value"] / running_max - 1
+        max_drawdown = drawdown.min()
+
+        turnover = self.table["position"].diff().abs()
+        average_turnover = turnover.mean()
+        total_turnover = turnover.sum()
+        trade_frequency = turnover[turnover > 0].sum() / len(turnover)
+
+        metrics = {
+            "total_return": total_return,
+            "annual_volatility": annual_volatility,
+            "annual_sharpe": annual_sharpe,
+            "max_drawdown": max_drawdown,
+            "average_turnover": average_turnover,
+            "total_turnover": total_turnover,
+            "trade_frequency": trade_frequency
+        }
+        return metrics
+
     def print_backtest_results(self):
         """
         Prints the backtesting results in a readable format.
         """
         # Implement logic to print the backtesting results
-        print(self.table.head(20))  # Print the first 20 rows of the backtesting results
-
-    def evaluate_performance(self):
-        # Implement performance evaluation logic here
-        pass
+        print(self.table.head(10))  # Print the first 20 rows of the backtesting results
+        print("\nSummary Metrics:")
+        for key, value in self.summary_metrics().items():
+            print(f"{key}: {value}")

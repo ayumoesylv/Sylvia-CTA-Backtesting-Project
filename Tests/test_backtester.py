@@ -54,6 +54,26 @@ def test_run_backtest():
 
     print("All tests passed for Backtester run_backtest.")
 
+def test_summary_metrics():
+    # Test data for initialization
+    prices = pd.Series([100, 101, 102, 103, 104], index=pd.date_range(start='2023-01-01', periods=5))
+    signal = pd.Series([0, 1, 0, -1, 0], index=pd.date_range(start='2023-01-01', periods=5))
+
+    # Initialize the Backtester
+    bt = backtester.Backtester(prices, signal)
+
+    # Run the backtest
+    bt.run_backtest()
+
+    # Get summary metrics
+    metrics = bt.summary_metrics()
+
+    # Check if the metrics dictionary contains expected keys
+    expected_keys = ['total_return', 'annual_volatility', 'annual_sharpe', 'max_drawdown', 'average_turnover', 'total_turnover', 'trade_frequency']
+    assert all(key in metrics for key in expected_keys), "Summary metrics missing expected keys"
+
+    print("All tests passed for Backtester summary_metrics.")
+
 def test_print_backtest_results():
     # Test data for initialization
     prices = pd.Series([100, 101, 102, 103, 104], index=pd.date_range(start='2023-01-01', periods=5))
@@ -68,7 +88,10 @@ def test_print_backtest_results():
     # Print the backtest results
     bt.print_backtest_results()
 
+
+
 if __name__ == "__main__":
     test_backtester_initialization()
     test_run_backtest()
+    test_summary_metrics()
     test_print_backtest_results()

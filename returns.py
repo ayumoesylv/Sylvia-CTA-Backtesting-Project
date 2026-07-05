@@ -17,17 +17,18 @@ def get_stock_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
     return stock_data
 
 
-def get_returns_series(stock_data: pd.DataFrame) -> pd.Series:
+def get_returns_series(ticker: str, stock_data: pd.DataFrame) -> pd.Series:
     """
     Returns the daily returns of the stock based on adjusted closing prices as pd.Series object. Read-only 
     function. 
 
     Preconditions: 
+    `ticker` must be a valid stock ticker symbol, and `stock_data` must be a DataFrame containing historical stock data with an `Close` column that is auto-adjusted.
     `stock_data` must be a DataFrame containing historical stock data with an `Close` column that is auto-adjusted.
     """
     assert isinstance(stock_data, pd.DataFrame), "Input must be a pandas DataFrame"
     assert 'Close' in stock_data.columns, "DataFrame must contain a 'Close' column"
-    returns = stock_data['Close'].pct_change().dropna()
+    returns = stock_data[('Close', ticker)].pct_change().dropna()
     return returns
 
 def print_stock_data_with_returns(stock_data: pd.DataFrame):
