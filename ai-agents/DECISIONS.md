@@ -13,3 +13,10 @@ Decided to use percentage-return momentum is preferred because it is scale-invar
 Decided to use a jupyter notebook as the strategy driver rather than specialized module
 
 Reason: When building AI models don't want to have to reload everytime I want to change something 
+
+## Decision 4 - 
+
+Decided to let my backtester class expose public facing methods to evaluate the strategy
+
+Reason: ??
+
