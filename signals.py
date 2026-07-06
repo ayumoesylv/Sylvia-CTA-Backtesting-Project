@@ -20,6 +20,9 @@ def momentum_signal(prices, window=20):
     signal[momentum > 0] = 1  # Buy signal
     signal[momentum < 0] = -1  # Sell signal
 
+    # account for transaction costs 
+    # account for execution delay 
+
     return signal
 
 def macd_signal(prices, short_window=12, long_window=26, signal_window=9):

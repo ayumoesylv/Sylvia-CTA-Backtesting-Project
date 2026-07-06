@@ -20,3 +20,13 @@ Decided to let my backtester class expose public facing methods to evaluate the 
 
 Reason: ??
 
+## Decision 5 - 
+
+Decided to create a subclass RealsticBacktester extending Backtester instead of modifying backtester code directly for ease of editing 
+
+## 07.06.2026
+## Decision 6 - 
+
+Decided to make execution prices floats before modifying them 
+
+Reason: execution prices in realistic backtester was being interpreted as int64, causing bug with float being assigned to it

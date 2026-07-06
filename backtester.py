@@ -12,8 +12,19 @@ class Backtester:
     """
     # CONSTRUCTOR
     def __init__(self, prices, signal, initial_cash=100000):
+        """
+        prices (numeric pd.Series): A pandas Series containing the historical stock prices.
+        signal (numeric pd.Series): A pandas Series containing the trading signals.
+        initial_cash (float): The initial cash balance for the backtesting simulation. Default is 100000.
+        """
         # self.prices = prices
         # self.signal = signal
+        assert isinstance(prices, pd.Series), "Prices must be a pandas Series"
+        assert isinstance(signal, pd.Series), "Signal must be a pandas Series"
+        assert all(prices.index == signal.index), "Prices and signal must have the same index"
+        # assert isinstance(initial_cash, (int, float)), "Initial cash must be a number"
+        # assert isinstance(prices.iloc[0], (int, float)), "Prices must be numeric"
+        # assert isinstance(signal.iloc[1], (int, float)), "Signal must be numeric"
         self.table = pd.DataFrame(index=prices.index)
         self.table["prices"] = prices
         self.table["signal"] = signal
