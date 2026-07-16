@@ -17,19 +17,39 @@ def get_stock_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
     return stock_data
 
 
-def get_returns_series(ticker: str, stock_data: pd.DataFrame) -> pd.Series:
+def get_returns_series(close_data: pd.Series) -> pd.Series:
     """
-    Returns the daily returns of the stock based on adjusted closing prices as pd.Series object. Read-only 
-    function. 
+    Returns daily asset returns based on a close-price Series.
 
     Preconditions: 
-    `ticker` must be a valid stock ticker symbol, and `stock_data` must be a DataFrame containing historical stock data with an `Close` column that is auto-adjusted.
-    `stock_data` must be a DataFrame containing historical stock data with an `Close` column that is auto-adjusted.
+    `close_data` must be a pandas Series containing close prices.
+    """
+    assert isinstance(close_data, pd.Series), "Input must be a pandas Series"
+    returns = close_data.pct_change().dropna()
+    return returns
+
+def convert_to_raw_series(ticker: str, stock_data: pd.DataFrame) -> pd.Series: 
+    """
+    Returns the close price column as a pd.Series.
+
+    Preconditions: 
+        `stock_data` must be a DataFrame containing close-price data from yfinance or CTA CSVs.
     """
     assert isinstance(stock_data, pd.DataFrame), "Input must be a pandas DataFrame"
-    assert 'Close' in stock_data.columns, "DataFrame must contain a 'Close' column"
-    returns = stock_data[('Close', ticker)].pct_change().dropna()
-    return returns
+    if isinstance(stock_data.columns, pd.MultiIndex):
+        if ('Close', ticker) in stock_data.columns:
+            return stock_data[('Close', ticker)]
+        close_data = stock_data['Close']
+        if isinstance(close_data, pd.DataFrame) and len(close_data.columns) == 1:
+            return close_data.iloc[:, 0]
+        raise KeyError("Ticker is required when DataFrame contains multiple close columns")
+    if ('Close', ticker) in stock_data.columns:
+        return stock_data[('Close', ticker)]
+    if 'Close' in stock_data.columns:
+        return stock_data['Close']
+    if 'close' in stock_data.columns:
+        return stock_data['close']
+    raise KeyError("DataFrame must contain a close price column")
 
 def print_stock_data_with_returns(stock_data: pd.DataFrame):
     """
@@ -38,7 +58,7 @@ def print_stock_data_with_returns(stock_data: pd.DataFrame):
     Parameters:
     stock_data (pd.DataFrame): A DataFrame containing historical stock data.
     """
-    returns_series = get_returns_series(stock_data)
+    returns_series = get_returns_series(convert_to_raw_series("", stock_data))
     combined_data = stock_data.copy()
     combined_data['Returns'] = returns_series
     print(combined_data.head(20))
